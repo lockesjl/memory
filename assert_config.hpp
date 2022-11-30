@@ -23,6 +23,7 @@
 #ifdef BOOST_STACKTRACE_USE_BACKTRACE
 #include <boost/stacktrace.hpp>
 #include <fmt/core.h>
+#include "arena/if_in_constexpr.hpp"
 
 template <std::size_t N>
 constexpr auto function_name(const char (&funcName)[N]) {
@@ -50,9 +51,22 @@ inline void print_assert(char const* expr, std::string_view msg, std::string_vie
     }
     std::terminate();
 }
+
+template <int LINE>
+struct assert_line {};
+template <typename... Args>
+constexpr inline bool assertion_failed(Args...) {
+    return true;
+}
+
+
 #define AssertMsg(expr, msg)                                                          \
     {                                                                                               \
-        if (!(expr)) {                                                                              \
+        if (in_constexpr()) {                                \
+            if (!(expr)) {                                     \
+                fmt::print(stderr, "Constexpr assert failed \n");  \
+            }                                                  \
+        } else if (!(expr)) {                                                                       \
             print_assert(#expr, std::string_view(msg), function_name(__PRETTY_FUNCTION__),          \
                               std::string(__FILE__), __LINE__);                                     \
         }                                                                                           \
