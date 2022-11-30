@@ -522,18 +522,18 @@ class stdb_vector : public core<T>
      *
      * default constructor is not noexcept, because it may throw std::bad_alloc
      */
-    constexpr stdb_vector() : core<T>() {}
+    stdb_vector() : core<T>() {}
 
     /*
      * constructor with capacity
      */
-    constexpr explicit stdb_vector(std::size_t size) : core<T>(size, size) {
+    explicit stdb_vector(std::size_t size) : core<T>(size, size) {
         if (size > 0) {
             construct_range(this->_start, this->_finish);
         }
     }
 
-    constexpr stdb_vector(std::size_t size, const T& value) : core<T>(size, size) {
+    stdb_vector(std::size_t size, const T& value) : core<T>(size, size) {
         if (size > 0) {
             construct_range_with_cref(this->_start, this->_finish, value);
         }
@@ -552,22 +552,22 @@ class stdb_vector : public core<T>
         }
     }
 
-    constexpr stdb_vector(std::initializer_list<T> init) : stdb_vector(init.begin(), init.end()) { }
+    stdb_vector(std::initializer_list<T> init) : stdb_vector(init.begin(), init.end()) { }
 
     /*
      * copy constructor of stdb_vector
      */
-    constexpr stdb_vector(const stdb_vector& other) = default;
+    stdb_vector(const stdb_vector& other) = default;
 
     /*
      * copy assignment operator of stdb_vector
      */
-    constexpr auto operator=(const stdb_vector& other) -> stdb_vector& = default;
+    auto operator=(const stdb_vector& other) -> stdb_vector& = default;
 
     /*
      * move constructor of stdb_vector
      */
-    constexpr stdb_vector(stdb_vector&&) noexcept = default;
+    stdb_vector(stdb_vector&&) noexcept = default;
 
     /*
      * move assignment operator of stdb_vector
@@ -576,7 +576,7 @@ class stdb_vector : public core<T>
 
     ~stdb_vector() = default;
 
-    constexpr void assign(std::size_t count, const T& value) {
+    void assign(std::size_t count, const T& value) {
         // cleanup old data
         if (count > this->capacity()) {
             // if count is larger than current capacity, we need to reallocate memory
@@ -615,24 +615,24 @@ class stdb_vector : public core<T>
     /*
      * assign from initializer list
      */
-    [[gnu::always_inline]] constexpr inline void assign(std::initializer_list<T> list) {
+    [[gnu::always_inline]]  inline void assign(std::initializer_list<T> list) {
         assign(list.begin(), list.end());
     }
 
     /*
      * Capacity section
      */
-    [[nodiscard, gnu::always_inline]] constexpr inline auto size() const noexcept -> size_type {
+    [[nodiscard, gnu::always_inline]]  inline auto size() const noexcept -> size_type {
         return core<T>::size();
     }
 
-    [[nodiscard, gnu::always_inline]] constexpr inline auto capacity() const noexcept -> size_type {
+    [[nodiscard, gnu::always_inline]]  inline auto capacity() const noexcept -> size_type {
         return core<T>::capacity();
     }
 
-    [[nodiscard, gnu::always_inline]] constexpr inline auto empty() const noexcept -> bool { return this->size() == 0; }
+    [[nodiscard, gnu::always_inline]]  inline auto empty() const noexcept -> bool { return this->size() == 0; }
 
-    [[nodiscard, gnu::always_inline]] constexpr inline auto max_size() const noexcept -> size_type {
+    [[nodiscard, gnu::always_inline]]  inline auto max_size() const noexcept -> size_type {
         return core<T>::max_size();
     }
 
@@ -645,7 +645,7 @@ class stdb_vector : public core<T>
      *
      * it is very heavy.
      */
-    constexpr void shrink_to_fit() {
+     void shrink_to_fit() {
         auto size = this->size();
         if (size == capacity()) [[unlikely]] {
             return;
@@ -666,7 +666,7 @@ class stdb_vector : public core<T>
      * reserve is not noexcept, because it may throw std::bad_alloc
      * reserve has no computing for new capacity, just do reallocation and data move.
      */
-    [[gnu::always_inline]] constexpr inline void reserve(size_type new_capacity) {
+    [[gnu::always_inline]]  inline void reserve(size_type new_capacity) {
         if (new_capacity > capacity()) [[likely]] {
             this->realloc_with_old_data(new_capacity);
         }
@@ -676,26 +676,26 @@ class stdb_vector : public core<T>
     /*
      * Element access section
      */
-    [[nodiscard, gnu::always_inline]] constexpr inline auto operator[](size_type index) noexcept -> reference {
+    [[nodiscard, gnu::always_inline]]  inline auto operator[](size_type index) noexcept -> reference {
         return this->at(index);
     }
 
-    [[nodiscard, gnu::always_inline]] constexpr inline auto operator[](size_type index) const noexcept
+    [[nodiscard, gnu::always_inline]]  inline auto operator[](size_type index) const noexcept
       -> const_reference {
         return this->at(index);
     }
 
-    [[nodiscard, gnu::always_inline]] constexpr inline auto at(std::size_t index) -> reference {
+    [[nodiscard, gnu::always_inline]]  inline auto at(std::size_t index) -> reference {
         return core<T>::at(index);
     }
 
-    [[nodiscard, gnu::always_inline]] constexpr inline auto at(size_type index) const -> const_reference {
+    [[nodiscard, gnu::always_inline]]  inline auto at(size_type index) const -> const_reference {
         return core<T>::at(index);
     }
 
-    [[nodiscard, gnu::always_inline]] constexpr inline auto data() noexcept -> pointer { return this->_start; }
+    [[nodiscard, gnu::always_inline]]  inline auto data() noexcept -> pointer { return this->_start; }
 
-    [[nodiscard, gnu::always_inline]] constexpr inline auto data() const noexcept -> const_pointer {
+    [[nodiscard, gnu::always_inline]]  inline auto data() const noexcept -> const_pointer {
         return this->_start;
     }
 
@@ -751,45 +751,45 @@ class stdb_vector : public core<T>
         }
         auto operator=(const IteratorT&) noexcept -> IteratorT& = default;
 
-        [[gnu::always_inline]] constexpr inline auto operator++() noexcept -> IteratorT& {
+        [[gnu::always_inline]]  inline auto operator++() noexcept -> IteratorT& {
             ++_ptr;
             return *this;
         }
 
-        [[gnu::always_inline, nodiscard]] constexpr inline auto operator++(int) noexcept -> IteratorT {
+        [[gnu::always_inline, nodiscard]]  inline auto operator++(int) noexcept -> IteratorT {
             auto tmp = *this;
             ++_ptr;
             return tmp;
         }
 
-        [[gnu::always_inline]] constexpr inline auto operator--() noexcept -> IteratorT& {
+        [[gnu::always_inline]]  inline auto operator--() noexcept -> IteratorT& {
             --_ptr;
             return *this;
         }
 
-        [[gnu::always_inline, nodiscard]] constexpr inline auto operator--(int) noexcept -> IteratorT {
+        [[gnu::always_inline, nodiscard]]  inline auto operator--(int) noexcept -> IteratorT {
             auto tmp = *this;
             --_ptr;
             return tmp;
         }
 
-        [[gnu::always_inline]] constexpr inline auto operator+=(difference_type n) noexcept -> IteratorT& {
+        [[gnu::always_inline]]  inline auto operator+=(difference_type n) noexcept -> IteratorT& {
             _ptr += n;
             return *this;
         }
 
-        [[gnu::always_inline]] constexpr inline auto operator-=(difference_type n) noexcept -> IteratorT& {
+        [[gnu::always_inline]]  inline auto operator-=(difference_type n) noexcept -> IteratorT& {
             _ptr -= n;
             return *this;
         }
 
-        [[nodiscard, gnu::always_inline]] constexpr inline auto operator*() const noexcept -> reference {
+        [[nodiscard, gnu::always_inline]]  inline auto operator*() const noexcept -> reference {
             return *_ptr;
         }
 
-        [[nodiscard, gnu::always_inline]] constexpr inline auto operator->() const noexcept -> pointer { return _ptr; }
+        [[nodiscard, gnu::always_inline]]  inline auto operator->() const noexcept -> pointer { return _ptr; }
 
-        [[nodiscard, gnu::always_inline]] constexpr inline auto operator[](std::size_t pos) const noexcept
+        [[nodiscard, gnu::always_inline]]  inline auto operator[](std::size_t pos) const noexcept
           -> reference {
             return *(_ptr + pos);
         }
@@ -1133,7 +1133,7 @@ class stdb_vector : public core<T>
     [[gnu::always_inline]] inline void pop_back() { destroy_ptr(this->_finish-- - 1); }
 
     template <Safety safety = Safety::Safe>
-    constexpr void resize(size_type count) {
+    void resize(size_type count) {
         if (count > this->size()) {
             if (count > this->capacity()) {
                 this->realloc_with_old_data(count);
@@ -1155,7 +1155,7 @@ class stdb_vector : public core<T>
         }
     }
 
-    constexpr void resize(size_type count, const_reference value) {
+    void resize(size_type count, const_reference value) {
         // no checking count == _size, because very unlikely, and it's not a big deal
         if (count > this->size()) {
             if (count > this->capacity()) {
@@ -1173,7 +1173,7 @@ class stdb_vector : public core<T>
         }
     }
 
-    [[gnu::always_inline]] constexpr inline void swap(stdb_vector& other) noexcept { core<T>::swap(other); }
+    [[gnu::always_inline]] inline void swap(stdb_vector& other) noexcept { core<T>::swap(other); }
 
     template <Safety safety = Safety::Safe>
     auto insert(const_iterator pos, const_reference value) -> iterator {
@@ -1288,7 +1288,7 @@ class stdb_vector : public core<T>
     }
 
     template <Safety safety = Safety::Safe>
-    [[gnu::always_inline]] constexpr inline auto insert(const_iterator pos, std::initializer_list<T> ilist) -> iterator {
+    [[gnu::always_inline]] inline auto insert(const_iterator pos, std::initializer_list<T> ilist) -> iterator {
         return insert<safety>(pos, ilist.begin(), ilist.end());
     }
 
@@ -1405,17 +1405,17 @@ auto operator<=>(const stdb_vector<T>& lhs, const stdb_vector<T>& rhs) -> std::s
 namespace std {
 
 template <typename T>
-constexpr void swap(stdb::container::stdb_vector<T>& lhs, stdb::container::stdb_vector<T>& rhs) {
+void swap(stdb::container::stdb_vector<T>& lhs, stdb::container::stdb_vector<T>& rhs) {
     lhs.swap(rhs);
 }
 
 template <class T, class U>
-constexpr auto erase(stdb::container::stdb_vector<T>& vec, const U& value) -> std::size_t {
+auto erase(stdb::container::stdb_vector<T>& vec, const U& value) -> std::size_t {
     return vec.erase(value);
 }
 
 template <class T, class Predicate>
-constexpr auto erase_if(stdb::container::stdb_vector<T>& vec, Predicate pred) -> std::size_t {
+auto erase_if(stdb::container::stdb_vector<T>& vec, Predicate pred) -> std::size_t {
     return vec.erase_if(pred);
 }
 
