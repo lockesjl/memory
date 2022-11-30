@@ -375,18 +375,18 @@ class core
         std::free(_start);
     }
 
-    constexpr void swap(core<T>& rhs) noexcept {
+    void swap(core<T>& rhs) noexcept {
         _start = std::exchange(rhs._start, _start);
         _finish = std::exchange(rhs._finish, _finish);
         _edge = std::exchange(rhs._edge, _edge);
     }
 
-    [[nodiscard, gnu::always_inline]] constexpr auto size() const -> size_type {
+    [[nodiscard, gnu::always_inline]] auto size() const -> size_type {
         Assert(_finish >= _start);
         return static_cast<size_type>(_finish - _start);
     }
 
-    [[nodiscard, gnu::always_inline]] constexpr auto capacity() const -> size_type {
+    [[nodiscard, gnu::always_inline]] auto capacity() const -> size_type {
         Assert(_edge >= _start);
         return static_cast<size_type>(_edge - _start);
     }
@@ -540,7 +540,7 @@ class stdb_vector : public core<T>
     }
 
     template <std::forward_iterator InputIt>
-    constexpr stdb_vector(InputIt first, InputIt last) : core<T>() {
+    stdb_vector(InputIt first, InputIt last) : core<T>() {
         int64_t size = last - first;
         // if size == 0, then do nothing.and just for caller convenience.
         Assert(size >= 0);
@@ -592,7 +592,7 @@ class stdb_vector : public core<T>
     }
 
     template <std::forward_iterator Iterator>
-    constexpr void assign(Iterator first, Iterator last) {
+    void assign(Iterator first, Iterator last) {
         int64_t size_to_assign = last - first;
         Assert(size_to_assign >= 0);
         auto count = (size_type)size_to_assign;  // NOLINT
@@ -699,22 +699,22 @@ class stdb_vector : public core<T>
         return this->_start;
     }
 
-    [[nodiscard, gnu::always_inline]] constexpr inline auto front() const noexcept -> const_reference {
+    [[nodiscard, gnu::always_inline]] inline auto front() const noexcept -> const_reference {
         Assert(size() > 0);
         return *this->_start;
     }
 
-    [[nodiscard, gnu::always_inline]] constexpr inline auto front() noexcept -> reference {
+    [[nodiscard, gnu::always_inline]] inline auto front() noexcept -> reference {
         Assert(size() > 0);
         return *this->_start;
     }
 
-    [[nodiscard, gnu::always_inline]] constexpr inline auto back() const noexcept -> const_reference {
+    [[nodiscard, gnu::always_inline]] inline auto back() const noexcept -> const_reference {
         Assert(size() > 0);
         return *(this->_finish - 1);
     }
 
-    [[nodiscard, gnu::always_inline]] constexpr inline auto back() noexcept -> reference {
+    [[nodiscard, gnu::always_inline]] inline auto back() noexcept -> reference {
         Assert(size() > 0);
         return *(this->_finish - 1);
     }
@@ -948,7 +948,7 @@ class stdb_vector : public core<T>
         this->_finish = this->_start;
     }
 
-    constexpr auto erase(const_iterator pos) -> iterator {
+    auto erase(const_iterator pos) -> iterator {
         Assert(pos >= cbegin() and pos < cend());
 
         auto pos_ptr = get_ptr_from_iter(pos);
@@ -958,7 +958,7 @@ class stdb_vector : public core<T>
         return iterator{(T*)pos_ptr};  // NOLINT
     }
 
-    constexpr auto erase(iterator pos) -> iterator {
+    auto erase(iterator pos) -> iterator {
         Assert(pos >= begin() and pos < end());
         T* ptr = get_ptr_from_iter(pos);
         destroy_ptr(ptr);
@@ -967,7 +967,7 @@ class stdb_vector : public core<T>
         return pos;
     }
 
-    constexpr auto erase(const_iterator first, const_iterator last) -> iterator {
+    auto erase(const_iterator first, const_iterator last) -> iterator {
         Assert(first >= cbegin() and last <= cend());
         Assert(last >= first);
         auto first_ptr = get_ptr_from_iter(first);
@@ -1176,7 +1176,7 @@ class stdb_vector : public core<T>
     [[gnu::always_inline]] constexpr inline void swap(stdb_vector& other) noexcept { core<T>::swap(other); }
 
     template <Safety safety = Safety::Safe>
-    constexpr auto insert(const_iterator pos, const_reference value) -> iterator {
+    auto insert(const_iterator pos, const_reference value) -> iterator {
         Assert(pos >= cbegin() && pos <= cend());
         T* pos_ptr = (T*)get_ptr_from_iter(pos);  // NOLINT
         if constexpr (safety == Safety::Safe) {
@@ -1204,7 +1204,7 @@ class stdb_vector : public core<T>
     }
 
     template <Safety safety = Safety::Safe>
-    constexpr auto insert(const_iterator pos, rvalue_reference value) -> iterator {
+    auto insert(const_iterator pos, rvalue_reference value) -> iterator {
         Assert((pos >= cbegin()) && (pos <= cend()));
         T* pos_ptr = (T*)get_ptr_from_iter(pos);  // NOLINT
         if constexpr (safety == Safety::Safe) {
@@ -1232,7 +1232,7 @@ class stdb_vector : public core<T>
     }
 
     template <Safety safety = Safety::Safe>
-    constexpr auto insert(const_iterator pos, size_type count, const_reference value) -> iterator {
+    auto insert(const_iterator pos, size_type count, const_reference value) -> iterator {
         Assert(count > 0);
         Assert(pos >= cbegin() && pos <= cend());
         auto size = this->size();
@@ -1258,7 +1258,7 @@ class stdb_vector : public core<T>
 
     template <Safety safety = Safety::Safe, class InputIt>
         requires std::input_iterator<InputIt>
-    constexpr auto insert(const_iterator pos, InputIt first, InputIt last) -> iterator {
+    auto insert(const_iterator pos, InputIt first, InputIt last) -> iterator {
         int64_t count = last - first;
         if (count == 0) [[unlikely]] {
             return iterator((T*)get_ptr_from_iter(pos));  // NOLINT
@@ -1293,7 +1293,7 @@ class stdb_vector : public core<T>
     }
 
     template <Safety safety = Safety::Safe, typename... Args>
-    constexpr auto emplace(iterator pos, Args&&... args) -> iterator {
+    auto emplace(iterator pos, Args&&... args) -> iterator {
         T* pos_ptr = get_ptr_from_iter(pos);
         if constexpr (safety == Safety::Safe) {
             if (this->full()) [[unlikely]] {
@@ -1319,7 +1319,7 @@ class stdb_vector : public core<T>
     }
 
     template <Safety safety = Safety::Safe, typename... Args>
-    constexpr auto emplace(size_type pos, Args&&... args) -> iterator {
+    auto emplace(size_type pos, Args&&... args) -> iterator {
         if constexpr (safety == Safety::Safe) {
             if (this->full()) [[unlikely]] {
                 reserve(compute_next_capacity());
